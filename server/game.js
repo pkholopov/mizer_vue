@@ -140,7 +140,7 @@ export const game = {
     if(this.isWidowTaken) {
       const playerWithWidow = this.players.find(player => player.isWidow)
       const playersWithoutWidow = this.players.filter(player => !player.isWidow)
-      if(playerWithWidow.roundScore < 30) {
+      if(playerWithWidow.roundScore < 31) {
         playerWithWidow.gameScore += 4 * this.scoreMultiplier
         this.scoreMultiplier = 1
       } else if(playerWithWidow.roundScore < 60) {
@@ -148,7 +148,7 @@ export const game = {
         this.scoreMultiplier = 1
       } else if(playerWithWidow.roundScore === 60) {
         this.scoreMultiplier *= 2
-      } else if(playerWithWidow.roundScore > 90) {
+      } else if(playerWithWidow.roundScore > 89) {
         playersWithoutWidow.forEach(player => player.gameScore += 4 * this.scoreMultiplier)
         this.scoreMultiplier = 1
       } else {
