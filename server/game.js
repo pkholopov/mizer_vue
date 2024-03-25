@@ -98,6 +98,7 @@ export const game = {
   dropWidow(playerId, cards) {
     const player = this.players.find(player => player.id === playerId)
     player.roundScore += cards.reduce((acc, card) => acc + card.score, 0)
+    player.droppedWidow = [...cards]
     player.cards = player.cards.filter(card => !cards.some(c => c.id === card.id))
     .sort((a, b) => b.suitId - a.suitId)
     .sort((a, b) => b.trumpStrength - a.trumpStrength);
@@ -133,7 +134,18 @@ export const game = {
     this.players.forEach(player => player.ready = false)
     this.firstTurnPlayer = (this.firstTurnPlayer + 1) % 3
     this.scoreCounter()
+    this.resetStateAfterRound()
+    this.players.forEach(player => player.roundReset())
+  },
+  
+  resetStateAfterRound() {
+    this.isGameStarted = false
+    this.isPrep = false
+    this.isWidowTaken = false
+    this.isTurn = false
+    this.widowRejectCounter = 0
     this.discardPile = []
+    this.widow = []
   },
 
   scoreCounter() {
@@ -169,5 +181,5 @@ export const game = {
         this.scoreMultiplier = 1
       }
     }
-  }
+  },
 }

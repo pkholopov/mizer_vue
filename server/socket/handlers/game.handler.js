@@ -3,8 +3,25 @@ import { game } from "../../game.js"
 export const gameHandler = (io, socket) => {
   
   const updateCards = (playerId) => {
-    socket.emit('game:updatePlayerCards', game.players.find(player => player.id === playerId).cards)
+    const player = game.players.find(player => player.id === playerId)
+    socket.emit('game:updatePlayerCards', {cards: player.cards, widow: player.discardedWidow})
   }
+
+  const updateGameStatus = () => {
+    socket.emit('game:status', {
+      cardsInGame: game.cardsInGame,
+      discardPile: game.discardPile,
+      gameCounter: game.gameCounter,
+      isGameStarted: game.isGameStarted,
+      isPrep: game.isPrep,
+      isWidowTaken: game.isWidowTaken,
+      
+    })
+  }
+
+  socket.on('game:statusUpdate', () => {
+    updateGameStatus()
+  })
 
   socket.on('game:playerReady',() => {
     if(game.isGameStarted) {

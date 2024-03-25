@@ -8,7 +8,7 @@
     <p v-if="player.ready && waitingForPlayers" class="text-xl absolute top-[50%] left-[50%] -translate-x-[50%] translate-y-[-50%]">Ожидаем игроков</p>
     <WidowRequest v-if="game.isPrep && player.ready" :turn="player.turn" @accept="game.acceptWidow" @reject="rejectWidow"/>
     <GameBoard v-if="!game.isPrep && player.ready" :cards="game.cardsInGame" />
-    <WidowBoard v-if="discardedWidow.length" :cards="discardedWidow" class="absolute right-1"/>
+    <WidowBoard v-if="game.discardedWidow.length" :cards="game.discardedWidow" class="absolute right-1"/>
     <CardsBoard :cards="game.playerCards" @turn="turn" class="absolute bottom-1"/>
   </div>
 </template>
@@ -31,7 +31,6 @@ import { ref, computed, onMounted } from 'vue';
 const player = usePlayerStore();
 const game = useGameStore();
 const players = ref([])
-const discardedWidow = ref([])
 
 const waitingForPlayers = computed(() => (players.value.length < 3 || !players.value.every(p => p.ready)));
 
@@ -40,7 +39,6 @@ game.bindEvents()
 const playerReady = () => {
   player.playerReady()
   game.playerReady()
-  discardedWidow.value = []
   game.updateDiscardPile([])
 }
 
@@ -55,10 +53,10 @@ const rejectWidow = () => {
 
 const turn = (card) => {
   if(game.drop) {
-    discardedWidow.value.push(card)
-    if(discardedWidow.value.length === 2) {
-      player.widow = discardedWidow.value
-      game.discardWidow(discardedWidow.value)
+    game.discardedWidow.push(card)
+    if(game.discardedWidow.length === 2) {
+      player.widow = game.discardedWidow
+      game.discardWidow(game.discardedWidow)
       return
     }
     return
@@ -74,5 +72,8 @@ const turn = (card) => {
 
 onMounted(() => {
   socket.emit('players:getAll')
+  socket.emit('game:statusUpdate')
+  game.getCards()
+  game.updateDiscardPile()
 })
 </script>

@@ -12,6 +12,8 @@ export const useGameStore = defineStore('game', () => {
   const gameCounter = ref(0)
   const isGameStarted = ref(false)
   const isPrep = ref(false)
+  const isWidowTaken = ref(false)
+  const discardedWidow = ref([])
   const drop = ref(false)
 
   const getCards = () => {
@@ -37,10 +39,20 @@ export const useGameStore = defineStore('game', () => {
     getCards()
   }
 
+  const updateGame = (gameStatus) => {
+    cardsInGame.value = gameStatus.cardsInGame
+    discardPile.value = gameStatus.discardPile
+    gameCounter.value = gameStatus.gameCounter
+    isGameStarted.value = gameStatus.isGameStarted
+    isPrep.value = gameStatus.isPrep
+    isWidowTaken.value = gameStatus.isWidowTaken
+  }
+
   const bindEvents = () => {
 
-    socket.on('game:updatePlayerCards', (cards) => {
+    socket.on('game:updatePlayerCards', ({cards, widow}) => {
       playerCards.value = cards
+      discardedWidow.value = widow
     })
 
     socket.on('game:updateGameCards', (cards) => {
@@ -62,6 +74,10 @@ export const useGameStore = defineStore('game', () => {
       socket.emit('players:getAll')
     })
 
+    socket.on('game:status', (gameStatus) => {
+      updateGame(gameStatus)
+    })
+
     socket.on('game:stop', (counter) => {
       isGameStarted.value = false
       gameCounter.value = counter
@@ -74,6 +90,8 @@ export const useGameStore = defineStore('game', () => {
     gameCounter,
     isGameStarted,
     isPrep,
+    isWidowTaken,
+    discardedWidow,
     drop,
     getCards,
     playerReady,

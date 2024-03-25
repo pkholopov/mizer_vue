@@ -11,6 +11,19 @@ class Player {
     this.ready = false
     this.turn = false
     this.isWidow = false
+    this.discardedWidow = []
+  }
+  roundReset() {
+    this.roundScore = 0
+    this.cards = []
+    this.ready = false
+    this.turn = false
+    this.isWidow = false
+    this.discardedWidow = []
+  }
+  gameReset() {
+    this.gameScore = 0
+    this.roundReset()
   }
 }
 
